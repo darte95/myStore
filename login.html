@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTAE Robot Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-laptop"></i>
+                OTAE Robot Shop
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html"><i class="fas fa-home"></i> สินค้า</a></li>
+                <li><a href="works.html"><i class="fas fa-briefcase"></i> ผลงาน</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone"></i> ติดต่อ</a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li><a href="login.html" class="active"><i class="fas fa-user"></i> เข้าสู่ระบบ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container" style="max-width:500px;">
+        <div class="order-form">
+            <h2 style="text-align:center; margin-bottom:2rem;">
+                <i class="fas fa-lock" style="color:#667eea;"></i> เข้าสู่ระบบ
+            </h2>
+            
+            <div id="loginForm">
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> อีเมล</label>
+                    <input type="email" id="loginEmail" placeholder="admin@techshop.com" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> รหัสผ่าน</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button onclick="loginUser()" class="btn btn-primary" style="width:100%; padding:1rem;">
+                    <i class="fas fa-sign-in-alt"></i> เข้าสู่ระบบ
+                </button>
+                <!--<p style="text-align:center; margin-top:1rem;">
+                    <a href="#" onclick="showRegister()" style="color:#667eea;">สร้างบัญชีผู้ใช้</a>
+                </p>-->
+            </div>
+            
+            <!--<div id="registerForm" style="display:none;">
+                <h2 style="text-align:center; margin-bottom:2rem;">
+                    <i class="fas fa-user-plus" style="color:#667eea;"></i> สมัครสมาชิก
+                </h2>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> ชื่อ-นามสกุล</label>
+                    <input type="text" id="registerName" placeholder="สมชาย ใจดี" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> อีเมล</label>
+                    <input type="email" id="registerEmail" placeholder="example@email.com" required>
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-key"></i> รหัสผ่าน</label>
+                    <input type="password" id="registerPassword" placeholder="อย่างน้อย 6 ตัวอักษร" required>
+                </div>
+                <button onclick="registerUser()" class="btn btn-success" style="width:100%; padding:1rem;">
+                    <i class="fas fa-user-plus"></i> สมัครสมาชิก
+                </button>
+                <p style="text-align:center; margin-top:1rem;">
+                    <a href="#" onclick="showLogin()" style="color:#667eea;">มีบัญชีแล้ว? เข้าสู่ระบบ</a>
+                </p>
+            </div>-->
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        function loginUser() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            auth.signInWithEmailAndPassword(email, password)
+                .then(() => {
+                    alert('เข้าสู่ระบบสำเร็จ!');
+                    window.location.href = 'admin.html';
+                })
+                .catch(error => {
+                    alert('เข้าสู่ระบบล้มเหลว: ' + error.message);
+                });
+        }
+        
+        function registerUser() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    return db.collection('users').doc(userCredential.user.uid).set({
+                        name: name,
+                        email: email,
+                        role: 'user',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                })
+                .then(() => {
+                    alert('สมัครสมาชิกสำเร็จ!');
+                    showLogin();
+                })
+                .catch(error => {
+                    alert('สมัครสมาชิกล้มเหลว: ' + error.message);
+                });
+        }
+        
+        function showRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+        }
+        
+        function showLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
