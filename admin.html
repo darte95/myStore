@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin -- OTAE Robot Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-laptop"></i>
+                OTAE Robot Shop
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html"><i class="fas fa-home"></i> สินค้า</a></li>
+                <li><a href="works.html"><i class="fas fa-briefcase"></i> ผลงาน</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone"></i> ติดต่อ</a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li><a href="admin.html" class="active"><i class="fas fa-cog"></i> จัดการ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>ระบบจัดการ</h1>
+            <p>จัดการสินค้าและผลงาน</p>
+        </div>
+
+        <div style="display:flex; gap:1rem; margin-bottom:2rem; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="showAddProduct()">
+                <i class="fas fa-plus"></i> เพิ่มสินค้า
+            </button>
+            <button class="btn btn-success" onclick="showAddWork()">
+                <i class="fas fa-plus"></i> เพิ่มผลงาน
+            </button>
+            <button class="btn btn-warning" onclick="viewMessages()" style="background:#fdcb6e; color:#2d3436;">
+                <i class="fas fa-envelope"></i> ข้อความจากลูกค้า
+            </button>
+            <button class="btn btn-info" onclick="viewOrders()" style="background:#0984e3; color:white;">
+                <i class="fas fa-shopping-basket"></i> คำสั่งซื้อสินค้า
+            </button>
+        </div>
+
+        <div id="adminContent">
+            <h2>จัดการสินค้า</h2>
+            <div class="admin-panel">
+                <div id="adminProducts"></div>
+            </div>
+            
+            <h2 style="margin-top:3rem;">จัดการผลงาน</h2>
+            <div class="admin-panel">
+                <div id="adminWorks"></div>
+            </div>
+        </div>
+
+        <!-- Messages Section -->
+        <div id="messagesSection" style="display:none;">
+            <h2><i class="fas fa-envelope"></i> ข้อความจากลูกค้า</h2>
+            <div class="admin-panel">
+                <div id="adminMessages"></div>
+            </div>
+        </div>
+
+        <!-- Orders Section -->
+        <div id="ordersSection" style="display:none;">
+            <h2><i class="fas fa-shopping-basket"></i> คำสั่งซื้อสินค้า</h2>
+            <div class="admin-panel">
+                <div id="adminOrders"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Product -->
+    <div id="productModal" class="modal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header">
+                <h2 id="modalTitle">เพิ่มสินค้า</h2>
+                <span class="modal-close" onclick="closeModal('productModal')">&times;</span>
+            </div>
+            <form id="productForm">
+                <input type="hidden" id="productId">
+                <div class="form-group">
+                    <label>ชื่อสินค้า <span style="color:red;">*</span></label>
+                    <input type="text" id="pName" required>
+                </div>
+                <div class="form-group">
+                    <label>ราคา (บาท) <span style="color:red;">*</span></label>
+                    <input type="number" id="pPrice" required>
+                </div>
+                <div class="form-group">
+                    <label>รายละเอียด <span style="color:red;">*</span></label>
+                    <textarea id="pDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ลิงค์รูปภาพ (ใส่หลายลิงค์คั่นด้วยเครื่องหมาย ,) <span style="color:red;">*</span></label>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="pImageInput" placeholder="https://example.com/image1.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('product')">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="pImageInput2" placeholder="https://example.com/image2.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('product', 2)">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="pImageInput3" placeholder="https://example.com/image3.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('product', 3)">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <p style="font-size:0.8rem; color:#636e72; margin-top:0.5rem;">
+                        <i class="fas fa-info-circle"></i> แนะนำ: ใช้ลิงค์จาก Imgur, PostImage, หรือ Google Drive (ต้องตั้งค่าให้สาธารณะ)
+                    </p>
+                    <div class="image-preview-grid" id="productImagePreview"></div>
+                    <input type="hidden" id="pImages" value="">
+                </div>
+                <div class="form-group">
+                    <label>จำนวนยอดขาย</label>
+                    <input type="number" id="pSales" value="0">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:1rem;">
+                    <i class="fas fa-save"></i> บันทึก
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Add/Edit Work -->
+    <div id="workModal" class="modal">
+        <div class="modal-content" style="max-width:700px;">
+            <div class="modal-header">
+                <h2 id="workModalTitle">เพิ่มผลงาน</h2>
+                <span class="modal-close" onclick="closeModal('workModal')">&times;</span>
+            </div>
+            <form id="workForm">
+                <input type="hidden" id="workId">
+                <div class="form-group">
+                    <label>ชื่อผลงาน <span style="color:red;">*</span></label>
+                    <input type="text" id="wName" required>
+                </div>
+                <div class="form-group">
+                    <label>รายละเอียด <span style="color:red;">*</span></label>
+                    <textarea id="wDescription" rows="4" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>ลิงค์รูปภาพ (ใส่หลายลิงค์คั่นด้วยเครื่องหมาย ,) <span style="color:red;">*</span></label>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="wImageInput" placeholder="https://example.com/image1.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('work')">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="wImageInput2" placeholder="https://example.com/image2.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('work', 2)">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <div style="display:flex; gap:0.5rem; margin-bottom:0.5rem;">
+                        <input type="text" id="wImageInput3" placeholder="https://example.com/image3.jpg" style="flex:1;">
+                        <button type="button" class="btn btn-primary" onclick="addImageUrl('work', 3)">
+                            <i class="fas fa-plus"></i> เพิ่ม
+                        </button>
+                    </div>
+                    <p style="font-size:0.8rem; color:#636e72; margin-top:0.5rem;">
+                        <i class="fas fa-info-circle"></i> แนะนำ: ใช้ลิงค์จาก Imgur, PostImage, หรือ Google Drive (ต้องตั้งค่าให้สาธารณะ)
+                    </p>
+                    <div class="image-preview-grid" id="workImagePreview"></div>
+                    <input type="hidden" id="wImages" value="">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%; padding:1rem;">
+                    <i class="fas fa-save"></i> บันทึก
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        // Global variables for image management
+        let productImages = [];
+        let workImages = [];
+
+        // Check auth
+        auth.onAuthStateChanged(user => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                loadAdminProducts();
+                loadAdminWorks();
+            }
+        });
+
+        // Add image URL
+        function addImageUrl(type, inputNumber = 1) {
+            const inputId = type === 'product' ? `pImageInput${inputNumber === 1 ? '' : inputNumber}` : `wImageInput${inputNumber === 1 ? '' : inputNumber}`;
+            const url = document.getElementById(inputId).value.trim();
+            
+            if (!url) {
+                showToast('กรุณาใส่ลิงค์รูปภาพ', 'error');
+                return;
+            }
+            
+            // Validate URL
+            if (!isValidImageUrl(url)) {
+                showToast('ลิงค์รูปไม่ถูกต้อง หรือไม่ใช่ไฟล์รูปภาพ', 'error');
+                return;
+            }
+            
+            const images = type === 'product' ? productImages : workImages;
+            images.push(url);
+            updateImagePreview(type, images);
+            document.getElementById(inputId).value = '';
+            showToast('เพิ่มลิงค์รูปสำเร็จ', 'success');
+        }
+
+        // Validate image URL
+        function isValidImageUrl(url) {
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'];
+            const urlLower = url.toLowerCase();
+            
+            try {
+                new URL(url);
+            } catch {
+                return false;
+            }
+            
+            const hasExtension = imageExtensions.some(ext => urlLower.endsWith(ext));
+            const imageHosts = ['imgur.com', 'postimage.org', 'postimg.cc', 'ibb.co', 'imageshack.com', 'flickr.com', 'googleusercontent.com', 'cloudinary.com', 'tinypic.com'];
+            const isImageHost = imageHosts.some(host => urlLower.includes(host));
+            
+            return hasExtension || isImageHost;
+        }
+
+        // Update image preview
+        function updateImagePreview(type, images) {
+            const container = document.getElementById(`${type}ImagePreview`);
+            
+            if (images.length === 0) {
+                container.innerHTML = `
+                    <div style="grid-column:1/-1; text-align:center; color:#b2bec3; padding:2rem;">
+                        <i class="fas fa-image" style="font-size:2rem; display:block; margin-bottom:0.5rem;"></i>
+                        ยังไม่มีรูปภาพ กรุณาเพิ่มลิงค์รูปด้านบน
+                    </div>
+                `;
+                updateHiddenInput(type);
+                return;
+            }
+            
+            container.innerHTML = images.map((url, index) => `
+                <div class="image-preview-item">
+                    <img src="${url}" alt="รูปที่ ${index + 1}" onerror="this.src='https://via.placeholder.com/150/ff6b6b/ffffff?text=Error+Load'">
+                    <button class="remove-image" onclick="removeImage('${type}', ${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                    <span class="image-order">#${index + 1}</span>
+                </div>
+            `).join('');
+            
+            updateHiddenInput(type);
+        }
+
+        // Remove image
+        function removeImage(type, index) {
+            if (confirm('คุณต้องการลบรูปนี้ใช่หรือไม่?')) {
+                const images = type === 'product' ? productImages : workImages;
+                images.splice(index, 1);
+                updateImagePreview(type, images);
+                showToast('ลบรูปสำเร็จ', 'success');
+            }
+        }
+
+        // Update hidden input
+        function updateHiddenInput(type) {
+            const images = type === 'product' ? productImages : workImages;
+            document.getElementById(`${type === 'product' ? 'p' : 'w'}Images`).value = images.join(',');
+        }
+
+        // Load admin products
+        function loadAdminProducts() {
+            db.collection('products').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                const container = document.getElementById('adminProducts');
+                container.innerHTML = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>รูป</th>
+                                <th>ชื่อสินค้า</th>
+                                <th>ราคา</th>
+                                <th>ยอดขาย</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${snapshot.docs.map(doc => `
+                                <tr>
+                                    <td>
+                                        ${doc.data().images && doc.data().images.length > 0 
+                                            ? `<img src="${doc.data().images[0]}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/50/ff6b6b/ffffff?text=Error'">`
+                                            : '<span style="color:#b2bec3;">ไม่มีรูป</span>'
+                                        }
+                                        ${doc.data().images && doc.data().images.length > 1 
+                                            ? `<span style="font-size:0.7rem;color:#636e72;">+${doc.data().images.length - 1}</span>`
+                                            : ''
+                                        }
+                                    </td>
+                                    <td>${doc.data().name}</td>
+                                    <td>฿${doc.data().price.toLocaleString()}</td>
+                                    <td>${doc.data().sales || 0}</td>
+                                    <td class="admin-actions">
+                                        <button class="btn btn-secondary" onclick="editProduct('${doc.id}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-danger" onclick="deleteProduct('${doc.id}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            });
+        }
+
+        // Load admin works
+        function loadAdminWorks() {
+            db.collection('works').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                const container = document.getElementById('adminWorks');
+                container.innerHTML = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>รูป</th>
+                                <th>ชื่อผลงาน</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${snapshot.docs.map(doc => `
+                                <tr>
+                                    <td>
+                                        ${doc.data().images && doc.data().images.length > 0 
+                                            ? `<img src="${doc.data().images[0]}" style="width:50px;height:50px;object-fit:cover;border-radius:8px;" onerror="this.src='https://via.placeholder.com/50/ff6b6b/ffffff?text=Error'">`
+                                            : '<span style="color:#b2bec3;">ไม่มีรูป</span>'
+                                        }
+                                        ${doc.data().images && doc.data().images.length > 1 
+                                            ? `<span style="font-size:0.7rem;color:#636e72;">+${doc.data().images.length - 1}</span>`
+                                            : ''
+                                        }
+                                    </td>
+                                    <td>${doc.data().name}</td>
+                                    <td class="admin-actions">
+                                        <button class="btn btn-secondary" onclick="editWork('${doc.id}')">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-danger" onclick="deleteWork('${doc.id}')">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            });
+        }
+
+        // Show add product
+        function showAddProduct() {
+            document.getElementById('productId').value = '';
+            document.getElementById('modalTitle').textContent = 'เพิ่มสินค้า';
+            document.getElementById('productForm').reset();
+            productImages = [];
+            updateImagePreview('product', []);
+            document.getElementById('pImageInput').value = '';
+            document.getElementById('pImageInput2').value = '';
+            document.getElementById('pImageInput3').value = '';
+            document.getElementById('productModal').style.display = 'flex';
+        }
+
+        // Edit product
+        function editProduct(id) {
+            db.collection('products').doc(id).get().then(doc => {
+                if (doc.exists) {
+                    const p = doc.data();
+                    document.getElementById('productId').value = id;
+                    document.getElementById('modalTitle').textContent = 'แก้ไขสินค้า';
+                    document.getElementById('pName').value = p.name;
+                    document.getElementById('pPrice').value = p.price;
+                    document.getElementById('pDescription').value = p.description;
+                    document.getElementById('pSales').value = p.sales || 0;
+                    productImages = p.images || [];
+                    updateImagePreview('product', productImages);
+                    document.getElementById('pImageInput').value = '';
+                    document.getElementById('pImageInput2').value = '';
+                    document.getElementById('pImageInput3').value = '';
+                    document.getElementById('productModal').style.display = 'flex';
+                }
+            });
+        }
+
+        // Delete product
+        function deleteProduct(id) {
+            if (confirm('คุณต้องการลบสินค้านี้ใช่หรือไม่?')) {
+                db.collection('products').doc(id).delete()
+                    .then(() => showToast('ลบสินค้าสำเร็จ', 'success'))
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        }
+
+        // Product form submit
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('productId').value;
+            const imageUrls = productImages;
+            
+            if (imageUrls.length === 0) {
+                showToast('กรุณาเพิ่มรูปภาพอย่างน้อย 1 รูป', 'error');
+                return;
+            }
+            
+            const data = {
+                name: document.getElementById('pName').value,
+                price: parseInt(document.getElementById('pPrice').value),
+                description: document.getElementById('pDescription').value,
+                images: imageUrls,
+                sales: parseInt(document.getElementById('pSales').value) || 0,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (id) {
+                db.collection('products').doc(id).update(data)
+                    .then(() => {
+                        closeModal('productModal');
+                        showToast('อัปเดตสินค้าสำเร็จ', 'success');
+                    })
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            } else {
+                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                db.collection('products').add(data)
+                    .then(() => {
+                        closeModal('productModal');
+                        showToast('เพิ่มสินค้าสำเร็จ', 'success');
+                    })
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        });
+
+        // Work functions
+        function showAddWork() {
+            document.getElementById('workId').value = '';
+            document.getElementById('workModalTitle').textContent = 'เพิ่มผลงาน';
+            document.getElementById('workForm').reset();
+            workImages = [];
+            updateImagePreview('work', []);
+            document.getElementById('wImageInput').value = '';
+            document.getElementById('wImageInput2').value = '';
+            document.getElementById('wImageInput3').value = '';
+            document.getElementById('workModal').style.display = 'flex';
+        }
+
+        function editWork(id) {
+            db.collection('works').doc(id).get().then(doc => {
+                if (doc.exists) {
+                    const w = doc.data();
+                    document.getElementById('workId').value = id;
+                    document.getElementById('workModalTitle').textContent = 'แก้ไขผลงาน';
+                    document.getElementById('wName').value = w.name;
+                    document.getElementById('wDescription').value = w.description;
+                    workImages = w.images || [];
+                    updateImagePreview('work', workImages);
+                    document.getElementById('wImageInput').value = '';
+                    document.getElementById('wImageInput2').value = '';
+                    document.getElementById('wImageInput3').value = '';
+                    document.getElementById('workModal').style.display = 'flex';
+                }
+            });
+        }
+
+        function deleteWork(id) {
+            if (confirm('คุณต้องการลบผลงานนี้ใช่หรือไม่?')) {
+                db.collection('works').doc(id).delete()
+                    .then(() => showToast('ลบผลงานสำเร็จ', 'success'))
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        }
+
+        document.getElementById('workForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const id = document.getElementById('workId').value;
+            const imageUrls = workImages;
+            
+            if (imageUrls.length === 0) {
+                showToast('กรุณาเพิ่มรูปภาพอย่างน้อย 1 รูป', 'error');
+                return;
+            }
+            
+            const data = {
+                name: document.getElementById('wName').value,
+                description: document.getElementById('wDescription').value,
+                images: imageUrls,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (id) {
+                db.collection('works').doc(id).update(data)
+                    .then(() => {
+                        closeModal('workModal');
+                        showToast('อัปเดตผลงานสำเร็จ', 'success');
+                    })
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            } else {
+                data.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                db.collection('works').add(data)
+                    .then(() => {
+                        closeModal('workModal');
+                        showToast('เพิ่มผลงานสำเร็จ', 'success');
+                    })
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        });
+
+        // View messages
+        function viewMessages() {
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('messagesSection').style.display = 'block';
+            document.getElementById('ordersSection').style.display = 'none';
+            loadAdminMessages();
+        }
+
+        // View orders
+        function viewOrders() {
+            document.getElementById('adminContent').style.display = 'none';
+            document.getElementById('messagesSection').style.display = 'none';
+            document.getElementById('ordersSection').style.display = 'block';
+            loadAdminOrders();
+        }
+
+        // Back to admin
+        function backToAdmin() {
+            document.getElementById('adminContent').style.display = 'block';
+            document.getElementById('messagesSection').style.display = 'none';
+            document.getElementById('ordersSection').style.display = 'none';
+        }
+
+        // Load admin messages
+        function loadAdminMessages() {
+            db.collection('messages').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                const container = document.getElementById('adminMessages');
+                
+                if (snapshot.docs.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding:3rem; color:#636e72;">
+                            <i class="fas fa-envelope" style="font-size:3rem; margin-bottom:1rem;"></i>
+                            <p>ยังไม่มีข้อความจากลูกค้า</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>อีเมล</th>
+                                <th>หัวข้อ</th>
+                                <th>ข้อความ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${snapshot.docs.map(doc => {
+                                const msg = doc.data();
+                                const date = msg.createdAt ? new Date(msg.createdAt.toDate()).toLocaleDateString('th-TH') : '-';
+                                return `
+                                    <tr>
+                                        <td>${date}</td>
+                                        <td>${msg.name || '-'}</td>
+                                        <td>${msg.email || '-'}</td>
+                                        <td>${msg.subject || '-'}</td>
+                                        <td style="max-width:300px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;" title="${msg.message || ''}">${msg.message || '-'}</td>
+                                        <td class="admin-actions">
+                                            <button class="btn btn-secondary" onclick="viewMessageDetail('${doc.id}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-danger" onclick="deleteMessage('${doc.id}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <div style="margin-top:1rem;">
+                        <button class="btn btn-secondary" onclick="backToAdmin()">
+                            <i class="fas fa-arrow-left"></i> กลับ
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // Load admin orders
+        function loadAdminOrders() {
+            db.collection('orders').orderBy('createdAt', 'desc').onSnapshot(snapshot => {
+                const container = document.getElementById('adminOrders');
+                
+                if (snapshot.docs.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align:center; padding:3rem; color:#636e72;">
+                            <i class="fas fa-shopping-basket" style="font-size:3rem; margin-bottom:1rem;"></i>
+                            <p>ยังไม่มีคำสั่งซื้อ</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = `
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>วันที่</th>
+                                <th>ชื่อลูกค้า</th>
+                                <th>เบอร์โทร</th>
+                                <th>อีเมล</th>
+                                <th>ยอดรวม</th>
+                                <th>สถานะ</th>
+                                <th>จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${snapshot.docs.map(doc => {
+                                const order = doc.data();
+                                const date = order.createdAt ? new Date(order.createdAt.toDate()).toLocaleDateString('th-TH') : '-';
+                                const status = order.status || 'pending';
+                                const statusClass = status === 'pending' ? 'btn-warning' : status === 'completed' ? 'btn-success' : 'btn-danger';
+                                const statusText = status === 'pending' ? 'รอดำเนินการ' : status === 'completed' ? 'เสร็จสิ้น' : 'ยกเลิก';
+                                
+                                return `
+                                    <tr>
+                                        <td>${date}</td>
+                                        <td>${order.fullname || '-'}</td>
+                                        <td>${order.phone || '-'}</td>
+                                        <td>${order.email || '-'}</td>
+                                        <td>฿${(order.total || 0).toLocaleString()}</td>
+                                        <td>
+                                            <span class="btn ${statusClass}" style="padding:0.3rem 0.8rem; font-size:0.8rem;">
+                                                ${statusText}
+                                            </span>
+                                        </td>
+                                        <td class="admin-actions">
+                                            <button class="btn btn-secondary" onclick="viewOrderDetail('${doc.id}')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="btn btn-danger" onclick="deleteOrder('${doc.id}')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                    <div style="margin-top:1rem;">
+                        <button class="btn btn-secondary" onclick="backToAdmin()">
+                            <i class="fas fa-arrow-left"></i> กลับ
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        // View message detail
+        function viewMessageDetail(id) {
+            db.collection('messages').doc(id).get().then(doc => {
+                if (doc.exists) {
+                    const msg = doc.data();
+                    const date = msg.createdAt ? new Date(msg.createdAt.toDate()).toLocaleString('th-TH') : '-';
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.style.display = 'flex';
+                    
+                    modal.innerHTML = `
+                        <div class="modal-content" style="max-width:600px;">
+                            <div class="modal-header">
+                                <h2>รายละเอียดข้อความ</h2>
+                                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+                            </div>
+                            <div style="padding:1rem 0;">
+                                <p><strong>วันที่:</strong> ${date}</p>
+                                <p><strong>ชื่อ-นามสกุล:</strong> ${msg.name || '-'}</p>
+                                <p><strong>อีเมล:</strong> ${msg.email || '-'}</p>
+                                <p><strong>หัวข้อ:</strong> ${msg.subject || '-'}</p>
+                                <p><strong>ข้อความ:</strong></p>
+                                <p style="background:#f8f9fa; padding:1rem; border-radius:8px; margin-top:0.5rem;">${msg.message || '-'}</p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                }
+            });
+        }
+
+        // View order detail
+        function viewOrderDetail(id) {
+            db.collection('orders').doc(id).get().then(doc => {
+                if (doc.exists) {
+                    const order = doc.data();
+                    const date = order.createdAt ? new Date(order.createdAt.toDate()).toLocaleString('th-TH') : '-';
+                    
+                    const itemsHtml = (order.items || []).map(item => `
+                        <tr>
+                            <td>${item.name || '-'}</td>
+                            <td>${item.quantity || 1}</td>
+                            <td>฿${(item.price || 0).toLocaleString()}</td>
+                            <td>฿${((item.price || 0) * (item.quantity || 1)).toLocaleString()}</td>
+                        </tr>
+                    `).join('');
+                    
+                    const modal = document.createElement('div');
+                    modal.className = 'modal';
+                    modal.style.display = 'flex';
+                    
+                    modal.innerHTML = `
+                        <div class="modal-content" style="max-width:700px;">
+                            <div class="modal-header">
+                                <h2>รายละเอียดคำสั่งซื้อ</h2>
+                                <span class="modal-close" onclick="this.closest('.modal').remove()">&times;</span>
+                            </div>
+                            <div style="padding:1rem 0;">
+                                <p><strong>วันที่:</strong> ${date}</p>
+                                <p><strong>ชื่อลูกค้า:</strong> ${order.fullname || '-'}</p>
+                                <p><strong>เบอร์โทร:</strong> ${order.phone || '-'}</p>
+                                <p><strong>อีเมล:</strong> ${order.email || '-'}</p>
+                                <p><strong>ที่อยู่:</strong> ${order.address || '-'}</p>
+                                ${order.notes ? `<p><strong>หมายเหตุ:</strong> ${order.notes}</p>` : ''}
+                                
+                                <h3 style="margin-top:1.5rem;">รายการสินค้า</h3>
+                                <table class="admin-table" style="margin-top:1rem;">
+                                    <thead>
+                                        <tr>
+                                            <th>สินค้า</th>
+                                            <th>จำนวน</th>
+                                            <th>ราคา</th>
+                                            <th>รวม</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${itemsHtml}
+                                    </tbody>
+                                </table>
+                                
+                                <p style="font-size:1.2rem; font-weight:600; margin-top:1rem; text-align:right;">
+                                    ยอดรวม: ฿${(order.total || 0).toLocaleString()}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(modal);
+                }
+            });
+        }
+
+        // Delete message
+        function deleteMessage(id) {
+            if (confirm('คุณต้องการลบข้อความนี้ใช่หรือไม่?')) {
+                db.collection('messages').doc(id).delete()
+                    .then(() => showToast('ลบข้อความสำเร็จ', 'success'))
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        }
+
+        // Delete order
+        function deleteOrder(id) {
+            if (confirm('คุณต้องการลบคำสั่งซื้อนี้ใช่หรือไม่?')) {
+                db.collection('orders').doc(id).delete()
+                    .then(() => showToast('ลบคำสั่งซื้อสำเร็จ', 'success'))
+                    .catch(err => showToast('เกิดข้อผิดพลาด: ' + err.message, 'error'));
+            }
+        }
+
+        // Helper functions
+        function closeModal(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

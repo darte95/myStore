@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTAE Robot Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-laptop"></i>
+                OTAE Robot Shop
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html"><i class="fas fa-home"></i> สินค้า</a></li>
+                <li><a href="works.html"><i class="fas fa-briefcase"></i> ผลงาน</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone"></i> ติดต่อ</a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li><a href="login.html"><i class="fas fa-user"></i> เข้าสู่ระบบ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>สั่งซื้อสินค้า</h1>
+            <p>กรุณากรอกข้อมูลให้ครบถ้วนเพื่อการจัดส่ง</p>
+        </div>
+
+        <div class="order-form">
+            <form id="orderForm">
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> ชื่อ-นามสกุล</label>
+                    <input type="text" id="fullname" placeholder="เช่น สมชาย ใจดี" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-phone"></i> เบอร์โทรศัพท์</label>
+                    <input type="tel" id="phone" placeholder="081-234-5678" required>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-envelope"></i> อีเมล</label>
+                    <input type="email" id="email" placeholder="example@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-map-marker-alt"></i> ที่อยู่จัดส่ง</label>
+                    <textarea id="address" rows="4" placeholder="บ้านเลขที่ ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fas fa-sticky-note"></i> หมายเหตุเพิ่มเติม</label>
+                    <textarea id="notes" rows="3" placeholder="เช่น ต้องการจัดส่งด่วน"></textarea>
+                </div>
+                
+                <div style="background:#f8f9fa; padding:1rem; border-radius:8px; margin:1rem 0;">
+                    <h3>สรุปรายการสั่งซื้อ</h3>
+                    <div id="orderSummary"></div>
+                    <div style="border-top:2px solid #dfe6e9; padding-top:1rem; margin-top:1rem;">
+                        <p style="font-size:1.2rem; font-weight:600;">
+                            รวมทั้งสิ้น: <span id="orderTotal" style="color:#667eea;">฿0</span>
+                        </p>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn btn-success" style="width:100%; padding:1rem; font-size:1.1rem;">
+                    <i class="fas fa-check-circle"></i> ยืนยันการสั่งซื้อ
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            
+            if (cart.length === 0) {
+                alert('กรุณาเลือกสินค้าก่อนสั่งซื้อ');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Display order summary
+            const summary = document.getElementById('orderSummary');
+            let total = 0;
+            
+            summary.innerHTML = cart.map(item => {
+                const subtotal = item.price * item.quantity;
+                total += subtotal;
+                return `
+                    <div style="display:flex; justify-content:space-between; padding:0.5rem 0; border-bottom:1px solid #dfe6e9;">
+                        <span>${item.name} x ${item.quantity}</span>
+                        <span>฿${subtotal.toLocaleString()}</span>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('orderTotal').textContent = `฿${total.toLocaleString()}`;
+            
+            // Handle form submit
+            document.getElementById('orderForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const orderData = {
+                    fullname: document.getElementById('fullname').value,
+                    phone: document.getElementById('phone').value,
+                    email: document.getElementById('email').value,
+                    address: document.getElementById('address').value,
+                    notes: document.getElementById('notes').value,
+                    items: cart,
+                    total: total,
+                    status: 'pending',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                db.collection('orders').add(orderData)
+                    .then(() => {
+                        localStorage.removeItem('cart');
+                        updateCartBadge();
+                        alert('สั่งซื้อสำเร็จ! ขอบคุณที่ไว้วางใจ');
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        alert('เกิดข้อผิดพลาด: ' + error.message);
+                    });
+            });
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

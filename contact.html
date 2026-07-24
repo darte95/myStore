@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTAE Robot Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-laptop"></i>
+                OTAE Robot Shop
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html"><i class="fas fa-home"></i> สินค้า</a></li>
+                <li><a href="works.html"><i class="fas fa-briefcase"></i> ผลงาน</a></li>
+                <li><a href="contact.html" class="active"><i class="fas fa-phone"></i> ติดต่อ</a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li><a href="login.html"><i class="fas fa-user"></i> เข้าสู่ระบบ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>ติดต่อเรา</h1>
+            <p>ช่องทางการติดต่อและสั่งซื้อสินค้า</p>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:3rem;">
+            <div>
+                <div class="contact-info">
+                    <div class="contact-card">
+                        <i class="fas fa-phone"></i>
+                        <h3>โทรศัพท์</h3>
+                        <p>086-181-4724</p>
+                       
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-envelope"></i>
+                        <h3>อีเมล</h3>
+                        <p>kritsadin.sk@gmail.com</p>
+                        
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <h3>ที่อยู่</h3>
+                        <p>fb: kritsadin.sk</p>
+                        <p>line: kritsadin.sk</p>
+                    </div>
+                    <div class="contact-card">
+                        <i class="fas fa-clock"></i>
+                        <h3>เวลาทำการ</h3>
+                        <p>จันทร์-ศุกร์: 09:00 - 18:00</p>
+                        <p>เสาร์-อาทิตย์: 10:00 - 16:00</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="order-form">
+                    <h3 style="margin-bottom:1.5rem;">ส่งข้อความถึงเรา</h3>
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label>ชื่อ-นามสกุล</label>
+                            <input type="text" placeholder="กรอกชื่อ-นามสกุล" required>
+                        </div>
+                        <div class="form-group">
+                            <label>อีเมล</label>
+                            <input type="email" placeholder="example@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label>หัวข้อ</label>
+                            <input type="text" placeholder="หัวข้อที่ต้องการติดต่อ">
+                        </div>
+                        <div class="form-group">
+                            <label>ข้อความ</label>
+                            <textarea rows="5" placeholder="รายละเอียดข้อความ..." required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary" style="width:100%;">
+                            <i class="fas fa-paper-plane"></i> ส่งข้อความ
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top:3rem;">
+            <h3 style="text-align:center; margin-bottom:1rem;">แผนที่ของเรา</h3>
+            <div style="background:#dfe6e9; height:300px; border-radius:16px; display:flex; align-items:center; justify-content:center;">
+                <p style="color:#636e72;">[แผนที่ Google Maps]</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+<script>
+        document.getElementById('contactForm')?.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const messageData = {
+                name: formData.get('name') || this.querySelector('input[type="text"]').value,
+                email: formData.get('email') || this.querySelector('input[type="email"]').value,
+                subject: formData.get('subject') || this.querySelectorAll('input')[2].value,
+                message: formData.get('message') || this.querySelector('textarea').value,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            // Get values directly from form inputs
+            const inputs = this.querySelectorAll('input, textarea');
+            messageData.name = inputs[0].value;
+            messageData.email = inputs[1].value;
+            messageData.subject = inputs[2].value;
+            messageData.message = inputs[3].value;
+            
+            db.collection('messages').add(messageData)
+                .then(() => {
+                    alert('ข้อความของคุณถูกส่งแล้ว เราจะติดต่อกลับโดยเร็วที่สุด');
+                    this.reset();
+                })
+                .catch(error => {
+                    alert('เกิดข้อผิดพลาด: ' + error.message);
+                });
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

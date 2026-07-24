@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTAE Robot Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-container">
+            <a href="index.html" class="navbar-brand">
+                <i class="fas fa-laptop"></i>
+                OTAE Robot Shop
+            </a>
+            <ul class="nav-menu">
+                <li><a href="index.html"><i class="fas fa-home"></i> สินค้า</a></li>
+                <li><a href="works.html"><i class="fas fa-briefcase"></i> ผลงาน</a></li>
+                <li><a href="contact.html"><i class="fas fa-phone"></i> ติดต่อ</a></li>
+                <li>
+                    <a href="cart.html" class="cart-icon">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span class="cart-badge" style="display:none;">0</span>
+                    </a>
+                </li>
+                <li><a href="login.html"><i class="fas fa-user"></i> เข้าสู่ระบบ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1>ตะกร้าสินค้า</h1>
+            <p>ตรวจสอบรายการสินค้าก่อนสั่งซื้อ ค่าจัดส่งเริ่มต้น 50 บาท(ตามน้ำหนักสินค้)</p>
+        </div>
+
+        <div id="cartItems"></div>
+        
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:2rem; padding:1.5rem; background:white; border-radius:16px; box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+            <div>
+                <p style="font-size:0.9rem; color:#636e72;">ยอดรวม</p>
+                <h2 style="color:#667eea;">฿<span id="totalPrice">0</span></h2>
+            </div>
+            <div style="display:flex; gap:1rem;">
+                <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+                    <i class="fas fa-arrow-left"></i> เลือกสินค้าเพิ่ม
+                </button>
+                <button class="btn btn-success" onclick="window.location.href='order.html'">
+                    <i class="fas fa-shopping-cart"></i> สั่งซื้อ
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            renderCart();
+        });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
